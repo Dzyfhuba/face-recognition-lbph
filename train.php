@@ -12,7 +12,7 @@ function trainNewModel($faceRecognizer, $faceClassifier, Array $images, Array $l
   $faceImages = $faceLabels = [];
   foreach ($images as $key => $image) {
     // if (!$key) continue;
-    echo $image;
+    echo "\nexist:". file_exists($image);
     $src = imread($image);
     $gray = cvtColor($src, COLOR_BGR2GRAY);
     $faces = [];
@@ -21,7 +21,7 @@ function trainNewModel($faceRecognizer, $faceClassifier, Array $images, Array $l
     equalizeHist($gray, $gray);
     foreach ($faces as $k => $face) {
       $faceImages[] = $gray->getImageROI($face); // face coordinates to image
-      $faceLabels[] = $key + 1; // me
+      $faceLabels[] = $key+1; // me
       cv\imwrite("results/recognize_face_by_lbph_me$k-$key.jpg", $gray->getImageROI($face));
     }
 

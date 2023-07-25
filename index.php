@@ -13,12 +13,12 @@ $path = $_SERVER['REQUEST_URI'];
 $method = $_SERVER['REQUEST_METHOD'];
 
 $labels = [
-  'unknown', 
-  'hafidz', 
-  'rizky',
-  'agung',
-  'didi',
-  'ferdi',
+  // 'unknown',
+  // 'hafidz',
+  // 'rizky',
+  // 'agung',
+  // 'didi',
+  // 'ferdi',
 ];
 
 // $images = [
@@ -30,18 +30,38 @@ $labels = [
 // ];
 
 if ($path === '/train' && $method === 'POST') {
+  $file_uploaded = "trainedImages/" . $_FILES["image"]["name"];
   if (!isset($_FILES['image'])) {
     // print_r($_FILES);
     echo "image required";
+    http_response_code(400);
     return;
   } else {
-    move_uploaded_file($_FILES['image']['tmp_name'], "trained_image/".$_FILES["image"]["name"]);
+    if (!file_exists('trainedImages')) mkdir('trainedImages');
+    move_uploaded_file($_FILES['image']['tmp_name'], $file_uploaded);
   }
+  
+  $images = ['images/segmentated/1689734916546.png'];
+  $labels = [$_POST['name']];
+  echo "exist: ". file_exists($images[0]);
+  echo "\n {$file_uploaded}";
 
-  $images = [];
+  $faceRecognizer = trainNewModel($faceRecognizer, $faceClassifier, $images, $labels);
 
-  // var_dump($images);
+  http_response_code(201);
+  echo json_encode([
+    'message' => 'image trained'
+  ]);
+}
 
-  $status = trainNewModel($faceRecognizer, $faceClassifier, $images, $labels);
-  print_r($status);
+if ($path === '/predict' && $method === 'POST') {
+  if (!isset($_FILES['image'])) {
+    // print_r($_FILES);
+    echo "image required";
+    http_response_code(400);
+    return;
+  } else {
+    if (!file_exists('predicted_images')) mkdir('predicted_images');
+    move_uploaded_file($_FILES['image']['tmp_name'], "predicted_images/" . $_FILES["image"]["name"]);
+  }
 }
